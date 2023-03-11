@@ -1,0 +1,14 @@
+{
+  "name": "reactionbot",
+  "version": "1.0.0",
+  "description": "This bot allows you to create roles based on reactions in Discord.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Elias Murcray",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.7.1"
+  }
+}
