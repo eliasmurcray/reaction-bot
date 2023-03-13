@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-const { Client, Events, GatewayIntentBits, Collection, REST, Routes } = require('discord.js');
+const { Client, Events, Partials, GatewayIntentBits, Collection, REST, Routes } = require('discord.js');
 const { token, clientId } = require('./secret.json');
 const commandFiles = fs.readdirSync('commands');
 const commands = [];
@@ -20,7 +20,10 @@ async function refreshCommands(commands) {
 refreshCommands(commands);
 
 // Initialize bot
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+	intents: [GatewayIntentBits.Guilds],
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction]
+});
 
 client.once(Events.ClientReady, (bot) => {
   console.log('Ready! Logged in as ' + bot.user.tag);
