@@ -14,7 +14,7 @@ const slashCommand = new SlashCommandBuilder()
 		.setDescription('Emoji number 1')
 		.setRequired(true));
 
-for(let i = 2; i !== 10; i++) {
+for(let i = 2; i !== 12; i++) {
   slashCommand
 		.addRoleOption((option) => option
 			.setName(`role-${i}`)
@@ -53,12 +53,12 @@ module.exports = {
 			const reaction = reactions[i];
 
 			promises.push(new Promise(async (resolve) => {
-				await message.react(reaction);
+				const reacted = await message.react(reaction);
 
 				if(!data.messages[message.id])
-					data.messages[message.id] = { emojis: { [reaction]: role.id } };
+					data.messages[message.id] = { emojis: { [reacted.emoji.name]: role.id } };
 				else
-					data.messages[message.id].emojis[reaction] = role.id;
+					data.messages[message.id].emojis[reacted.emoji.name] = role.id;
 				
 				resolve();
 			}));

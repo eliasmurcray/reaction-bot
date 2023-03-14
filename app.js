@@ -1,6 +1,9 @@
 const fs = require('node:fs');
-const { Client, Events, Partials, GatewayIntentBits, Collection, REST, Routes } = require('discord.js');
+const { Client, Events, Partials, Collection, REST, IntentsBitField, Routes } = require('discord.js');
 const { token, clientId } = require('./secret.json');
+
+const eventFiles = fs.readdirSync('events');
+
 const commandFiles = fs.readdirSync('commands');
 const commands = [];
 commandFiles.forEach((file) => {
@@ -21,8 +24,8 @@ refreshCommands(commands);
 
 // Initialize bot
 const client = new Client({
-	intents: [GatewayIntentBits.Guilds],
-	partials: [Partials.Message, Partials.Channel, Partials.Reaction]
+	intents: new IntentsBitField(3276799),
+	partials: [Partials.Message, Partials.Reaction]
 });
 
 client.once(Events.ClientReady, (bot) => {
@@ -46,27 +49,10 @@ client.once(Events.ClientReady, (bot) => {
 			}
 		}
 	});
-	
-	bot.on(Events.MessageReactionAdd, async (reaction, user) => {
-		console.log(reaction, user);
-		const data = JSON.parse(fs.readFileSync('./database/data.json'));
-		const message = data.messages[reaction.message.id];
-		console.log(message);
-		if(message) {
-			const emoji = reaction._emoji.name;
-			console.log(emoji);
-			if(message.emojis[emoji]) {
-				const role = reaction.message.guild.roles.cache.get(message.emojis[emoji]);
-				console.log(role);
-				if (!role) return;
-				const member = await reaction.message.guild.members.cache.get(user.id);
-				console.log(member);
-				member.roles.add(role);
-				console.log(`Role '${role}' added to ${user.tag}.`);
-			} else {
-				reaction.remove();
-			}
-		}
+
+	eventFiles.forEach((file) => {
+		const contents = require('./events/' + file);
+		bot.on(contents.eventName, contents.callback);
 	});
 });
 
