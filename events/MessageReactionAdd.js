@@ -14,7 +14,9 @@ module.exports = {
 				member.roles.add(role);
 				console.log(`Role '${role.name}' added to ${user.tag}.`);
 			} else {
-				reaction.remove();
+				if(user.id !== '1072595131905081497') {
+					reaction.remove();
+				}
 			}
 		}
 	}
