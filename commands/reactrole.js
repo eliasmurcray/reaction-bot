@@ -28,6 +28,7 @@ module.exports = {
   data: slashCommand,
 	async execute(interaction) {
 		const { options } = interaction;
+		const guildID = interaction.guild.id;
 		const roles = [];
 		const reactions = [];
 		let contentString = '**React To Get A Role**\n\n';
@@ -44,6 +45,7 @@ module.exports = {
 			content: contentString,
 			fetchReply: true
 		});
+		const messageID = message.id;
 		
 		const data = JSON.parse(fs.readFileSync('./database/data.json'));
 		const promises = [];
@@ -51,14 +53,25 @@ module.exports = {
 		for (let i = 0; i < roles.length; i++) {
 			const role = roles[i];
 			const reaction = reactions[i];
+			const roleID = role.id;
 
 			promises.push(new Promise(async (resolve) => {
 				const reacted = await message.react(reaction);
-
-				if(!data.messages[message.id])
-					data.messages[message.id] = { emojis: { [reacted.emoji.name]: role.id } };
-				else
-					data.messages[message.id].emojis[reacted.emoji.name] = role.id;
+				const emojiName = reacted.emoji.name;
+				
+				if(data[guildID] === undefined) {
+					data[guildID] = {
+						[messageID]: {
+							[emojiName]: roleID
+						}
+					};
+				} else if (data[guildID][messageID] === undefined) {
+					data[guildID][messageID] = {
+						[emojiName]: roleID
+					};
+				} else {
+					data[guildID][messageID][emojiName] = roleID;
+				}
 				
 				resolve();
 			}));

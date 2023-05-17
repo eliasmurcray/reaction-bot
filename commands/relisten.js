@@ -22,7 +22,8 @@ module.exports = {
 		}
 		const content = message.content;
 
-		const data = JSON.parse(fs.readFileSync('./database/data.json'));
+		const data = require('../database/data.json');
+		const guildID = interaction.guild.id;
 
 		// Construct emojis dataset from content
 		const emojis = {};
@@ -33,20 +34,19 @@ module.exports = {
 					if(line.startsWith('*') || line.length === 0) {
 						return resolve();
 					}
+					
+					const roleName = line.split(' - ')[0];
+					const role = interaction.guild.roles.cache.find(role => role.name == roleName);
+					const reactionID = line.split(' - ')[1].split(':')[2].split('>')[0];
+					const reacted = await message.react(reactionID);
 	
-					const [ name, reactionDelimiter ] = line.split(' - ');
-					const reactionID = reactionDelimiter.split(':')[2].split('>')[0];
-	
-					console.log(reactionID);
-					await message.react(reactionID);
-	
-					emojis[name] = reactionID;
+					emojis[reacted.emoji.name] = role.id;
 
 					resolve();
 				}));
 			});
 		await Promise.all(promises);
-		data.messages[messageID].emojis = emojis;
+		data[guildID][messageID] = emojis;
 
 		fs.writeFileSync('./database/data.json', JSON.stringify(data, null, 4));
 
